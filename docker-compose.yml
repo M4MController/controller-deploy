@@ -9,8 +9,6 @@ services:
             POSTGRES_USER: "m4m"
             POSTGRES_PASSWORD: "12345"
             POSTGRES_DB: "m4m"
-        volumes:
-            - /opt/postgres:/var/lib/postgresql/data
         restart: always
     frontend:
         build:
@@ -36,8 +34,28 @@ services:
         build:
             context: https://github.com/M4MController/controller-web.git
             dockerfile: sensors_polling/Dockerfile
+        environment:
+            USE_STUBS: 1
         devices:
             - "/dev/ttyUSB0:/dev/ttyUSB0"
+        depends_on:
+            - postgres
+        restart: always
+    radio:
+        build:
+            context: https://github.com/M4MController/controller-radio.git
+            dockerfile: Dockerfile
+        devices:
+            - "/dev/ttyACM0:/dev/xbee"
+        restart: always
+    signifier:
+        build:
+            context: https://github.com/M4MController/controller-radio.git
+            dockerfile: Dockerfile-signifier
+        environment:
+            DB_URI: postgresql://m4m:12345@postgres:5432/m4m
+        devices:
+            - "/dev/ttyACM0:/dev/xbee"
         depends_on:
             - postgres
         restart: always
