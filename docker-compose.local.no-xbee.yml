@@ -10,6 +10,8 @@ services:
             POSTGRES_PASSWORD: "12345"
             POSTGRES_DB: "m4m"
         restart: always
+        ports:
+            - 5432:5432
     frontend:
         build:
             context: https://github.com/M4MController/frontend.git
@@ -26,27 +28,21 @@ services:
         build:
             context: https://github.com/M4MController/controller-web.git
             dockerfile: Dockerfile
+        command: bash -c "python db_fill_random.py && python start.py"
+        ports:
+            - 5000:5000
         depends_on:
             - postgres
         restart: always
-    # todo: move to sensor repo
     sensor_obd_gps:
         build:
-            context: https://github.com/M4MController/controller-web.git
+            context: https://github.com/M4MController/controller-web.git#field-fix
             dockerfile: sensors_polling/Dockerfile
         environment:
             USE_STUBS: 1
-        devices:
-            - "/dev/ttyUSB0:/dev/ttyUSB0"
+            SEND_TO_SERVER: ""
         depends_on:
             - postgres
-        restart: always
-    radio:
-        build:
-            context: https://github.com/M4MController/controller-radio.git
-            dockerfile: Dockerfile
-        devices:
-            - "/dev/ttyACM0:/dev/xbee"
         restart: always
     signifier:
         build:
@@ -54,8 +50,6 @@ services:
             dockerfile: Dockerfile-signifier
         environment:
             DB_URI: postgresql://m4m:12345@postgres:5432/m4m
-        devices:
-            - "/dev/ttyACM0:/dev/xbee"
         depends_on:
             - postgres
         restart: always

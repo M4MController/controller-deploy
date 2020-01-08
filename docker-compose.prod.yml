@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+    postgres:
+        build:
+            context: https://github.com/M4MController/controller-web.git
+            dockerfile: Dockerfile-db
+        environment:
+            POSTGRES_USER: "m4m"
+            POSTGRES_PASSWORD: "12345"
+            POSTGRES_DB: "m4m"
+        restart: always
+    frontend:
+        build:
+            context: https://github.com/M4MController/frontend.git
+            dockerfile: Dockerfile
+            args:
+                MODE: lite
+                GOOGLE_API_MAPS_KEY: google_api_maps_key
+        ports:
+            - 80:80
+        depends_on:
+            - backend
+        restart: always
+    backend:
+        build:
+            context: https://github.com/M4MController/controller-web.git
+            dockerfile: Dockerfile
+        depends_on:
+            - postgres
+        restart: always
+    # todo: move to sensor repo
+    sensor_obd_gps:
+        build:
+            context: https://github.com/M4MController/controller-web.git
+            dockerfile: sensors_polling/Dockerfile
+        devices:
+            - "/dev/ttyUSB0:/dev/ttyUSB0"
+        depends_on:
+            - postgres
+        restart: always
+    radio:
+        build:
+            context: https://github.com/M4MController/controller-radio.git
+            dockerfile: Dockerfile
+        devices:
+            - "/dev/ttyACM0:/dev/xbee"
+        restart: always
+    signifier:
+        build:
+            context: https://github.com/M4MController/controller-radio.git
+            dockerfile: Dockerfile-signifier
+        environment:
+            DB_URI: postgresql://m4m:12345@postgres:5432/m4m
+        devices:
+            - "/dev/ttyACM0:/dev/xbee"
+        depends_on:
+            - postgres
+        restart: always
