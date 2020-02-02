@@ -44,7 +44,7 @@ services:
         privileged: true
         environment:
             SEND_TO_SERVER: ""
-            USE_STUBS: ""
+            USE_STUBS: 1
             DEVICE: "/dev/obd"
         volumes:
             - "/dev/obd:/dev/obd"
@@ -57,7 +57,7 @@ services:
         environment:
             DB_URI: postgresql://m4m:12345@postgres:5432/m4m
             DEVICE: "/dev/xbee"
-            USE_STUBS: 1
+            USE_STUBS: ""
         depends_on:
             - postgres
         privileged: true

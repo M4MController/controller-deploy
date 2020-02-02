@@ -34,26 +34,27 @@ services:
         build:
             context: https://github.com/M4MController/controller-web.git
             dockerfile: sensors_polling/Dockerfile
-        devices:
-            - "/dev/ttyUSB0:/dev/ttyUSB0"
         depends_on:
             - postgres
         restart: always
+        privileged: true
+        environment:
+            SEND_TO_SERVER: ""
+            USE_STUBS: ""
+            DEVICE: "/dev/obd"
+        volumes:
+            - "/dev/obd:/dev/obd"
     radio:
         build:
             context: https://github.com/M4MController/controller-radio.git
             dockerfile: Dockerfile
-        devices:
-            - "/dev/ttyACM0:/dev/xbee"
-        restart: always
-    signifier:
-        build:
-            context: https://github.com/M4MController/controller-radio.git
-            dockerfile: Dockerfile-signifier
+        volumes:
+            - "/dev/xbee:/dev/xbee"
         environment:
             DB_URI: postgresql://m4m:12345@postgres:5432/m4m
-        devices:
-            - "/dev/ttyACM0:/dev/xbee"
+            DEVICE: "/dev/xbee"
+            USE_STUBS: ""
         depends_on:
             - postgres
+        privileged: true
         restart: always
