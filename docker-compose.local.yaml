@@ -33,9 +33,9 @@ services:
         depends_on:
             - postgres
         restart: always
-    # todo: move to sensor repo
-    sensor_obd_gps:
+    sensor_obd:
         build:
+            # todo: move to sensor repo
             context: https://github.com/M4MController/controller-web.git
             dockerfile: sensors_polling/Dockerfile
         depends_on:
@@ -48,6 +48,17 @@ services:
             DEVICE: "/dev/obd"
         volumes:
             - "/dev/obd:/dev/obd"
+    sensor_gps:
+        build:
+            context: https://github.com/M4MController/sensor-gps.git
+            dockerfile: Dockerfile
+        depends_on:
+            - postgres
+        restart: always
+        privileged: true
+        environment:
+            USE_STUBS: 1
+            DB_URI: postgresql://m4m:12345@postgres:5432/m4m
     radio:
         build:
             context: https://github.com/M4MController/controller-radio.git
