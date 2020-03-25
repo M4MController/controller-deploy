@@ -1,0 +1,73 @@
+version: '3'
+
+services:
+    postgres:
+        build:
+            context: https://github.com/M4MController/controller-web.git
+            dockerfile: Dockerfile-db.arm32v6
+        environment:
+            POSTGRES_USER: "m4m"
+            POSTGRES_PASSWORD: "12345"
+            POSTGRES_DB: "m4m"
+        restart: always
+        ports:
+            - 5432:5432
+    frontend:
+        build:
+            # bundle located in arm32v6 branch
+            context: https://github.com/M4MController/frontend.git#arm32v6
+            dockerfile: Dockerfile.arm32v6
+            args:
+                MODE: lite
+                GOOGLE_API_MAPS_KEY: AIzaSyCGvoTgge8rSPwOhKowR7zPDB7h1mf12wk
+        ports:
+            - 80:80
+        depends_on:
+            - backend
+        restart: always
+    backend:
+        build:
+            context: https://github.com/M4MController/controller-web.git
+            dockerfile: Dockerfile.arm32v6
+        depends_on:
+            - postgres
+        restart: always
+    sensor_obd:
+        build:
+            context: https://github.com/M4MController/controller-web.git#arm32v6
+            dockerfile: sensors_polling/Dockerfile.arm32v6
+        depends_on:
+            - postgres
+        restart: always
+        privileged: true
+        environment:
+            SEND_TO_SERVER: ""
+            USE_STUBS: ""
+            DEVICE: "/dev/obd"
+        volumes:
+            - "/dev/obd:/dev/obd"
+    sensor_gps:
+        build:
+            context: https://github.com/M4MController/sensor-gps.git
+            dockerfile: Dockerfile.arm32v6
+        depends_on:
+            - postgres
+        restart: always
+        privileged: true
+        environment:
+            USE_STUBS: ""
+            DB_URI: postgresql://m4m:12345@postgres:5432/m4m
+    radio:
+        build:
+            context: https://github.com/M4MController/controller-radio.git#arm32v6
+            dockerfile: Dockerfile.arm32v6
+        volumes:
+            - "/dev/xbee:/dev/xbee"
+        environment:
+            DB_URI: postgresql://m4m:12345@postgres:5432/m4m
+            DEVICE: "/dev/xbee"
+            USE_STUBS: ""
+        depends_on:
+            - postgres
+        privileged: true
+        restart: always
