@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-    postgres:
+    database:
         build:
             context: https://github.com/M4MController/controller-web.git
             dockerfile: Dockerfile-db
@@ -27,15 +27,14 @@ services:
             context: https://github.com/M4MController/controller-web.git
             dockerfile: Dockerfile
         depends_on:
-            - postgres
+            - database
         restart: always
-    sensor_obd:
+    sensor-obd:
         build:
-            # todo: move to sensor repo
             context: https://github.com/M4MController/controller-web.git
             dockerfile: sensors_polling/Dockerfile
         depends_on:
-            - postgres
+            - database
         restart: always
         privileged: true
         environment:
@@ -44,17 +43,17 @@ services:
             DEVICE: "/dev/obd"
         volumes:
             - "/dev/obd:/dev/obd"
-    sensor_gps:
+    sensor-gps:
         build:
             context: https://github.com/M4MController/sensor-gps.git
             dockerfile: Dockerfile
         depends_on:
-            - postgres
+            - database
         restart: always
         privileged: true
         environment:
             USE_STUBS: ""
-            DB_URI: postgresql://m4m:12345@postgres:5432/m4m
+            DB_URI: postgresql://m4m:12345@database:5432/m4m
     radio:
         build:
             context: https://github.com/M4MController/controller-radio.git
@@ -62,10 +61,10 @@ services:
         volumes:
             - "/dev/xbee:/dev/xbee"
         environment:
-            DB_URI: postgresql://m4m:12345@postgres:5432/m4m
+            DB_URI: postgresql://m4m:12345@database:5432/m4m
             DEVICE: "/dev/xbee"
             USE_STUBS: ""
         depends_on:
-            - postgres
+            - database
         privileged: true
         restart: always
