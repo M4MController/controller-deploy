@@ -68,3 +68,12 @@ services:
             - database
         privileged: true
         restart: always
+    synchronizer:
+        build:
+            context: https://github.com/M4MController/controller-sync.git
+            dockerfile: Dockerfile
+        environment:
+            DB_URI: postgresql://m4m:12345@database:5432/m4m
+        depends_on:
+            - database
+        restart: always
