@@ -31,14 +31,14 @@ services:
         restart: always
     sensor-obd:
         build:
-            context: https://github.com/M4MController/controller-web.git
-            dockerfile: sensors_polling/Dockerfile
+            context: https://github.com/M4MController/sensor-obd.git
+            dockerfile: Dockerfile
         depends_on:
             - backend
         restart: always
         privileged: true
         environment:
-            SEND_TO_SERVER: ""
+            URI: http://backend:5000
             USE_STUBS: ""
             DEVICE: "/dev/obd"
         volumes:
