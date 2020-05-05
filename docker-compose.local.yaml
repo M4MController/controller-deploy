@@ -39,7 +39,7 @@ services:
             context: https://github.com/M4MController/controller-web.git
             dockerfile: sensors_polling/Dockerfile
         depends_on:
-            - database
+            - backend
         restart: always
         privileged: true
         environment:
@@ -53,12 +53,12 @@ services:
             context: https://github.com/M4MController/sensor-gps.git
             dockerfile: Dockerfile
         depends_on:
-            - database
+            - backend
         restart: always
         privileged: true
         environment:
             USE_STUBS: 1
-            DB_URI: postgresql://m4m:12345@database:5432/m4m
+            URI: http://backend:5000
     radio:
         build:
             context: https://github.com/M4MController/controller-radio.git
