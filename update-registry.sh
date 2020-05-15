@@ -22,7 +22,7 @@ docker push registry.meter4.me:25410/controller-radio
 
 # controller-sync
 docker build -t registry.meter4.me:25410/controller-sync https://github.com/M4MController/controller-sync.git
-docker push egistry.meter4.me:25410/controller-sync
+docker push registry.meter4.me:25410/controller-sync
 
 # sensor-obd
 docker build -t registry.meter4.me:25410/sensor-obd https://github.com/M4MController/sensor-obd.git
