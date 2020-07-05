@@ -42,10 +42,10 @@ services:
     radio:
         image: registry.meter4.me:25410/controller-radio
         volumes:
-            - "/dev/xbee:/dev/xbee"
+            - "/dev/ttyS0:/dev/ttyS0"
         environment:
             DB_URI: postgresql://m4m:12345@database:5432/m4m
-            DEVICE: "/dev/xbee"
+            DEVICE: "/dev/ttyS0"
         depends_on:
             - database
         privileged: true
