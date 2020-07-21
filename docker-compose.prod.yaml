@@ -51,7 +51,7 @@ services:
         privileged: true
         restart: always
     synchronizer:
-        image: registry.meter4.me:25410/controller-backend
+        image: registry.meter4.me:25410/controller-sync
         environment:
             DB_URI: postgresql://m4m:12345@database:5432/m4m
         depends_on:
